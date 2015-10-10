@@ -106,7 +106,9 @@ def process(filename):
     for page in PDFPage.get_pages(fp, pagenos, maxpages=maxpages):
         interpreter.process_page(page)
 
-    result['content'] = {}
+    result['content'] = {
+        "text": output.getvalue()
+    }
     content_types = ['cve', 'domain', 'hash', 'filename', 'ipv4', 'registry', 'url', 'email', 'country']
     for name in content_types:
         if not name in result['content']:
@@ -180,7 +182,7 @@ def store_database(result):
     from elasticsearch import Elasticsearch
     es_host = "{}:9200".format(config.get("db", "host"))
     es = Elasticsearch(es_host)
-    es.index(index="intel", id=result.pop('id'), doc_type="pdf", body=result)
+    es.index(index="sis", id=result.pop('id'), doc_type="pdf", body=result)
     return True
 
 def datetime_serialiser(obj):
