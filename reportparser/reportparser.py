@@ -31,7 +31,7 @@ class Parser(object):
     official_country_list = r'%s' % '|'.join(x.official_name.encode('utf-8') for x in pycountry.countries if hasattr(x, 'official_name'))
     country_list += '|' + official_country_list
     ipv4match = re.compile(r"\b((?:\d{1,3}\[?\.\]?){3}\d{1,3}(?:/[0-9][0-9])?)")
-    hashmatch = re.compile(r"\b([a-fA-F0-9]{128}|[a-fA-F0-9]{32}|[a-fA-F0-9]{40}|[a-fA-F0-9]{64}|(?:\d+):(?:[a-z0-9+\/]{10,}):(?:[a-z0-9+\/]{5,})(?:\s\d+)?)\b")
+    hashmatch = re.compile(r"\b([a-fA-F0-9]{128}|[a-fA-F0-9]{32}|[a-fA-F0-9]{40}|[a-fA-F0-9]{64}|(?:\d+):(?:[a-z0-9+\/]{10,}):(?:[a-z0-9+\/]{5,})(?:\s\d+)?)\b", re.I)
     countrymatch = re.compile(r"\b(%s)\b" % country_list, re.I)
     cvematch = re.compile(r"CVE-\d{4}-\d+\b", re.I)
     domainmatch = re.compile(r"\b((?:[a-zA-Z0-9.\-\[\]]{3,})\[?\.\]?(?:%s))\b" % tldlist, re.I)
@@ -97,9 +97,8 @@ class Parser(object):
             result['content']['domain'].append(x.lower())
 
         for x in self.hashmatch.findall(output):
-            if x in result['content']['hash']:
+            if x.lower() in result['content']['hash']:
                 continue
-            print x
             result['content']['hash'].append(x.lower())
 
         for x in self.ipv4match.findall(output):
